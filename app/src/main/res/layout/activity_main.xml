@@ -16,6 +16,7 @@
         android:autofillHints=""
         android:ems="10"
         android:inputType="number|textPersonName"
+        android:text="1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -35,7 +36,7 @@
     <Spinner
         android:id="@+id/start_currency_spinner"
         android:layout_width="128dp"
-        android:layout_height="40dp"
+        android:layout_height="47dp"
         android:layout_marginStart="32dp"
         android:layout_marginLeft="32dp"
         android:layout_marginTop="112dp"
@@ -44,7 +45,7 @@
 
     <Spinner
         android:id="@+id/final_currency_spinner"
-        android:layout_width="127dp"
+        android:layout_width="128dp"
         android:layout_height="47dp"
         android:layout_marginTop="112dp"
         android:layout_marginEnd="36dp"

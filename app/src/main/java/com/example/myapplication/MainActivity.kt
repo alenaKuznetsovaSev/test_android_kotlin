@@ -1,12 +1,14 @@
 package com.example.myapplication
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.widget.EditText
-import android.widget.Spinner
-import android.widget.TextView
+import android.view.View
+import android.widget.*
+import android.widget.AdapterView.OnItemSelectedListener
+import androidx.appcompat.app.AppCompatActivity
+import java.lang.Math.round
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -21,19 +23,63 @@ class MainActivity : AppCompatActivity() {
 
         val start_currency_field = findViewById<EditText>(R.id.start_currency_field)
         val final_currency_field = findViewById<EditText>(R.id.final_currency_field)
-        var start_currency_spinner = findViewById<Spinner>(R.id.start_currency_spinner);
-        var final_currency_spinner = findViewById<Spinner>(R.id.final_currency_spinner);
 
-        var  currencies = HashMap<String, Double>()
+        val start_currency_spinner = findViewById<Spinner>(R.id.start_currency_spinner)
+        val final_currency_spinner = findViewById<Spinner>(R.id.final_currency_spinner)
 
+
+
+        val  currencies = HashMap<String, Double>()
+        var listOfKeys = object : ArrayList<String>(){}
         response = response.split("{")[2].split("}")[0]
         val pairs:List<String> = response.split(",")
         pairs.forEach { item ->
-            val currency = item.split(":")[0].toString()
+            val currency = item.split(":")[0].substring(1, 4)
             val value = item.split(":")[1].toDouble()
             currencies[currency] = value
+            listOfKeys.add(currency)
         }
         currencies["EUR"] = 1.0
+
+        println(currencies.keys)
+
+        val adapter: ArrayAdapter<String> = ArrayAdapter<String>(
+            this,
+            android.R.layout.simple_spinner_item, listOfKeys
+        )
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        start_currency_spinner.setAdapter(adapter)
+        final_currency_spinner.setAdapter(adapter)
+
+        start_currency_spinner.setSelection(listOfKeys.indexOf("RUB"))
+        final_currency_spinner.setSelection(listOfKeys.indexOf("USD"))
+
+        start_currency_spinner.onItemSelectedListener = object : OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                itemSelected: View, selectedItemPosition: Int, selectedId: Long
+            ) {
+               start_currency_field.setText(start_currency_field.text.toString())
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+        final_currency_spinner.onItemSelectedListener = object : OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                itemSelected: View, selectedItemPosition: Int, selectedId: Long
+            ) {
+                val toast = Toast.makeText(
+                    applicationContext,
+                    "Ваш выбор: " + selectedItemPosition, Toast.LENGTH_SHORT
+                )
+                toast.show()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
+
 
         start_currency_field.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(chs: Editable?) {}
@@ -49,14 +95,13 @@ class MainActivity : AppCompatActivity() {
                         val selected_start: String = start_currency_spinner.getSelectedItem().toString()
                         val selected_final: String = final_currency_spinner.getSelectedItem().toString()
                         val numb = chs.toString().toDouble()/ currencies[selected_start] !!* currencies[selected_final]!!
-                        val res = String.format("%.2f", numb)
-                        final_currency_field.setText(res)
+                        val res = round(numb*100)/100.0
+                        final_currency_field.setText(res.toString())
                     }
                     firstEdit = true
                 }
             }
         })
-
         final_currency_field.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(chs: Editable?) {}
 
@@ -70,9 +115,9 @@ class MainActivity : AppCompatActivity() {
                     } else {
                         val selected_start: String = start_currency_spinner.getSelectedItem().toString()
                         val selected_final: String = final_currency_spinner.getSelectedItem().toString()
-                        val numb = 0 // chs.toString().toDouble()/ currencies[selected_final]!! * currencies[selected_start]!!
-                        val res = String.format("%.2f", numb)
-                        start_currency_field.setText(res)
+                        val numb = chs.toString().toDouble()/ currencies[selected_final]!! * currencies[selected_start]!!
+                        val res = round(numb*100)/100.0
+                        start_currency_field.setText(res.toString())
                     }
                     firstEdit = true
                 }
